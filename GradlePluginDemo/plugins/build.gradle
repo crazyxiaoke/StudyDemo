@@ -1,0 +1,33 @@
+plugins {
+    id 'groovy'
+    id 'java-gradle-plugin'
+    id 'org.jetbrains.kotlin.jvm'
+    id 'maven-publish'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'com.zxk.plugin'
+            artifactId 'router-plugin'
+            version '1.0.0'
+            artifact tasks.jar
+        }
+    }
+    repositories {
+        maven {
+            url uri('../local_mavenrepo')
+        }
+    }
+}
+
+dependencies {
+    implementation "com.android.tools.build:gradle:7.0.2"
+    implementation gradleApi()
+    implementation localGroovy()
+}
