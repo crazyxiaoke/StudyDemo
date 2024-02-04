@@ -7,6 +7,8 @@ import static com.alibaba.android.arouter.facade.enums.RouteType.PROVIDER;
 import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.google.auto.service.AutoService;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
@@ -16,6 +18,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -43,7 +46,7 @@ import javax.tools.Diagnostic;
  * @Date： 2024-01-19 15:08
  */
 @SupportedOptions("MODULE_NAME")
-@SupportedAnnotationTypes({"com.alibaba.android.arouter.facade.annotation.Route"})
+@SupportedAnnotationTypes({"com.alibaba.android.arouter.facade.annotation.Route","com.alibaba.android.arouter.facade.annotation.Autowired"})
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @AutoService(Processor.class)
 public class AutogenerateRouterProcessor extends AbstractProcessor {
@@ -60,16 +63,19 @@ public class AutogenerateRouterProcessor extends AbstractProcessor {
     private TypeMirror mTypeFragment;
     private TypeMirror mTypeProvider;
 
+    private String moduleName="";
+
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
+        moduleName=processingEnv.getOptions().get("MODULE_NAME");
         mFiler = processingEnv.getFiler();
         messager = processingEnv.getMessager();
         mElementUtils = processingEnv.getElementUtils();
         mTypesUtils = processingEnv.getTypeUtils();
         processingEnv.getTypeUtils();
         messager.printMessage(Diagnostic.Kind.NOTE, "AutogenerateRouterProcessor init");
-
+        messager.printMessage(Diagnostic.Kind.NOTE,"moduleName="+moduleName);
         mTypeActivity = mElementUtils.getTypeElement(ACTIVITY.getClassName()).asType();
         mTypeFragment = mElementUtils.getTypeElement(FRAGMENT.getClassName()).asType();
         mTypeProvider = mElementUtils.getTypeElement(PROVIDER.getClassName()).asType();
@@ -80,6 +86,10 @@ public class AutogenerateRouterProcessor extends AbstractProcessor {
         if (set == null || set.isEmpty()) {
             return false;
         }
+        for (TypeElement typeElement : set) {
+            messager.printMessage(Diagnostic.Kind.NOTE,"typeElement="+typeElement.getSimpleName());
+            messager.printMessage(Diagnostic.Kind.NOTE,"type="+typeElement.asType());
+        }
         Set<? extends Element> rootElement = roundEnvironment.getElementsAnnotatedWithAny(Set.of(Route.class, Autowired.class));
 
         if (rootElement == null || rootElement.isEmpty()) {
@@ -88,6 +98,10 @@ public class AutogenerateRouterProcessor extends AbstractProcessor {
         List<MethodSpec> methods = new ArrayList<>();
         for (Element element : rootElement) {
             MethodSpec methodSpec = null;
+            messager.printMessage(Diagnostic.Kind.NOTE,"type="+element.asType());
+            messager.printMessage(Diagnostic.Kind.NOTE,"e.type="+element.getEnclosingElement().asType());
+            Autowired autowired=element.getAnnotation(Autowired.class);
+            messager.printMessage(Diagnostic.Kind.NOTE,"autowired="+autowired);
             if (mTypesUtils.isSubtype(element.asType(), mTypeActivity)) {
                 //Activity
                 methodSpec = gotoActivity(element);
@@ -104,7 +118,7 @@ public class AutogenerateRouterProcessor extends AbstractProcessor {
 //            MethodSpec methodSpec=MethodSpec.methodBuilder("goto").build();
         }
 
-        TypeSpec typeSpec = TypeSpec.classBuilder("RouterManager")
+        TypeSpec typeSpec = TypeSpec.classBuilder("RouterManager"+moduleName)
                 .addModifiers(Modifier.PUBLIC)
                 .addMethods(methods)
                 .build();
@@ -118,9 +132,18 @@ public class AutogenerateRouterProcessor extends AbstractProcessor {
     }
 
 
+
     private MethodSpec gotoActivity(Element element) {
-        MethodSpec methodSpec = MethodSpec.methodBuilder("").build();
-        return methodSpec;
+        String simpleName=element.getSimpleName().toString();
+        String path=element.getAnnotation(Route.class).path();
+        messager.printMessage(Diagnostic.Kind.NOTE,element.getSimpleName());
+        messager.printMessage(Diagnostic.Kind.NOTE,"path="+path);
+        return MethodSpec.methodBuilder("goto"+simpleName)
+                .addModifiers(Modifier.PUBLIC)
+                .addModifiers(Modifier.STATIC)
+                .returns(void.class)
+                .addStatement("$T.getInstance().build($S).navigation()", ClassName.get("com.alibaba.android.arouter.launcher","ARouter"),path)
+                .build();
     }
 
     private MethodSpec getFragment(Element element) {

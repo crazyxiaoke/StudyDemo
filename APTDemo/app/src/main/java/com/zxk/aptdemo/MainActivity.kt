@@ -2,8 +2,10 @@ package com.zxk.aptdemo
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.TextView
 import com.alibaba.android.arouter.facade.annotation.Autowired
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.alibaba.android.arouter.launcher.ARouter
 import com.zxk.apt_annotation.AptDemoAnnotation
 import com.zxk.apt_api.MyAptApi
 
@@ -24,5 +26,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         MyAptApi.init(this)
+        val tvBtn=findViewById<TextView>(R.id.tv_btn)
+        tvBtn.setOnClickListener {
+        }
     }
 }

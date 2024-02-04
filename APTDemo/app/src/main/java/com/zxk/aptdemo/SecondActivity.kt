@@ -2,6 +2,7 @@ package com.zxk.aptdemo
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.alibaba.android.arouter.facade.annotation.Route
 import com.zxk.apt_annotation.AptDemoAnnotation
 
 /**
@@ -10,6 +11,7 @@ import com.zxk.apt_annotation.AptDemoAnnotation
  * @Description
  * @Date： 2024-01-18 15:30
  */
+@Route(path="/main/second")
 class SecondActivity:AppCompatActivity() {
 
     @AptDemoAnnotation(desc = "我是SecondActivity test变量")
@@ -17,6 +19,6 @@ class SecondActivity:AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        String::class.java
+        setContentView(R.layout.activity_second)
     }
 }

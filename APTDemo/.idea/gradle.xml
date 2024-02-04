@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/apt-annotation" />
             <option value="$PROJECT_DIR$/apt-api" />
             <option value="$PROJECT_DIR$/apt-compiler" />
+            <option value="$PROJECT_DIR$/mdMain" />
           </set>
         </option>
       </GradleProjectSettings>
