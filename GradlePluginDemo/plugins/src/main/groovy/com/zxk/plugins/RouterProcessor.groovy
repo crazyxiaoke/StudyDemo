@@ -11,10 +11,11 @@ class RouterProcessor implements Plugin<Project>{
 
         def android=project.extensions.getByType(AppExtension)
         android.applicationVariants.all{variant->
-            println("variant=${variant.variantData}")
+            println("variant1=${variant.variantData}")
             def config=project.extensions.getByName(AppConstants.ROUTER_CONFIG)
             println("config=${config.version}")
         }
+        android.registerTransform(new DemoTransform())
     }
 }
 

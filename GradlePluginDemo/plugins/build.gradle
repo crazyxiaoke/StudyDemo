@@ -1,13 +1,22 @@
 plugins {
     id 'groovy'
     id 'java-gradle-plugin'
-    id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.20' apply false
     id 'maven-publish'
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+gradlePlugin {
+    plugins {
+        plugin {
+            id = 'com.zxk.plugins'
+            implementationClass = 'com.zxk.plugins.RouterProcessor'
+        }
+    }
 }
 
 publishing {
@@ -26,8 +35,12 @@ publishing {
     }
 }
 
+repositories {
+    gradlePluginPortal()
+    google()
+    jcenter()
+}
+
 dependencies {
-    implementation "com.android.tools.build:gradle:7.0.2"
-    implementation gradleApi()
-    implementation localGroovy()
+    implementation "com.android.tools.build:gradle:8.2.2"
 }

@@ -1,0 +1,21 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "APTDemo"
+include ':app'
+include ':apt-api'
+include ':apt-annotation'
+include ':apt-compiler'
+include ':AutoGenerateRouter-compiler'
+include ':AutoGenerateRouter-annotation'
